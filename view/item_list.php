@@ -1,53 +1,79 @@
-<?php include 'header.php'; ?>
-<main>
+<?php include 'view/header.php'; ?>
 
 
-
-<aside>
-    <h2>Categories</h2>
-    <nav>
-    <select id="select" name="select">
-    <?php foreach ($categories as $category) : ?> <option>
-    <a href="?category_id=<?php echo $category['categoryID']; ?>"> <?php echo $category['categoryName']; ?>
-    </a> </option>
-    <?php endforeach; ?> 
-    </select>
-</nav>
-</aside> 
-<?php
- 
-
-   foreach($todoItems as $item): ?>
-    <div>
-        <h3><?php echo $item['Title'] ?></h3>
-        <h3><?php echo $item['Description'] ?></h3>
-        <form action="<?php $_SERVER['PHP_SELF'] ?>" method="POST">
-        <input type="hidden" id="itemNum" name="itemNum" value="<?php echo $item['ItemNum'] ?>">
-        <button type="submit">Remove</button>
-   </form>
-
-    </div>
-    <?php endforeach; ?>
-
-    <section>
-        <h2>Add Item</h2>
-        <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
-            <label for='title'>Title</label>
-            <input type="text" id="title" name="title" required>
-            <label for='description'>Description</label>
-            <input type="text" id="description" name="description" required>
-            <button type="submit" name="add_item" value="add_item">Add Item</button>
-</form>
-<p><a href="index.php?action=add_item">Click here</a> to add a new item to the list.</p>
-</section>
-
-    <section>
-        <h2>Add Category</h2>
-        <form action="<?php echo $_SERVER['PHP_SELF'] ?>" method="POST">
-            <label for='category'>Category</label>
-            <input type="text" id="category" name="category" required>
-            <button type="submit" name="addCategory" value="addCategory">Add Category</button>
+<section id="list" class="list">
+    <header class="list_row list_header">
+        <h1>My To Do List</h1>
+        <form action="." method="get" id="list_header_select" class="list_header_select">
+            <input type="hidden" name="action" value="list_items">
+            <select name="category_id" required>
+                <option value="0">View All Categories</option>
+                <?php foreach ($categories as $category) : ?> 
+                    <?php if($category_id == $category['categoryID']) { ?>
+                        <option value="<?= $category['categoryID']?>" selected>
+                        <?php } else { ?>
+                        <option value="<?= $category['categoryID'] ?>">
+                        <?php } ?>
+                        <?= $category['categoryName'] ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <button class="add-button bold">Submit</button>
+            </form>
+        </header>
+        <?php if($todoItems) { ?>
+            <?php foreach ($todoItems as $todoItem) : ?>
+                <div class="list_row">
+                    <div class="list_item">
+                        <p class="bold"><?= $todoItem['categoryName'] ?></p>
+                        <p><?=$todoItem['Title'] ?></p>
+                        <p class="item_description"><?= $todoItem['Description'] ?></p>
+                    </div>
+                    <div class="list_removeItem">
+                        <form action="." method="POST">
+                            <input type="hidden" name="action" value="delete_item">
+                            <input type="hidden" name="itemNum" value="<?= $todoItem['ItemNum'] ?>">
+                            <button class="remove-button">❌</button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+                <?php ?>
+                <?php } else { ?>
+                    <br>
+                    <?php if($category_id){ ?>
+                        <p>No todo items exist in this category yet. </p>
+                        <?php } else { ?>
+                            <p>No todo items exist yet.</p>
+                        <?php } ?>
+                        <br>
+                        <?php } ?>
     </section>
 
-</main>
-<?php include 'footer.php'; ?>
+    <section id="add" class="add">
+    <h2>Add Item</h2>
+    <form action="." method="POST" id="add_item" class="add_form">
+        <input type="hidden" name="action" value="add_item">
+        <div class="add_inputs">
+            <label>Categories:</label>
+            <select name="category_id" required>
+                <option value="">Please select</option>
+                <?php foreach($categories as $category) : ?>
+                    <option value="<?= $category['categoryID']; ?>">
+                        <?= $category['categoryName']; ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <label>Title</label>
+                <input type="text" name="title" placeholder="Title" required>
+                <label>Description</label>
+                <input type="text" name="description" maxlength="120" placeholder="Description" required>
+            </div>
+            <div class="add_addItem">
+                <button class="add-button bold">Add</button>
+            </div>
+        </form>
+    </section>
+    <p><a href=".?action=list_categories">View/Edit Categories</a></p>
+
+<?php include 'view/footer.php'; ?>
